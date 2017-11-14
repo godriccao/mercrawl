@@ -1,10 +1,10 @@
 # mercrawl
 
-mercrawl craws Mercari with your search condition and send you the result by email.
+mercrawl crawls Mercari items of your search condition and send you the result by email.
 
 ## Usage
 
-`mercraw search_condition`
+`mercrawl search_condition`
 
     search_condition: string after https://www.mercari.com/jp/search/?
 

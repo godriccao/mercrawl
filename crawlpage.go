@@ -10,17 +10,25 @@ import (
 )
 
 const base string = "https://www.mercari.com/jp/search/?"
+const pageWorkers int = 5
+const itemWorkers int = 10
 
 var itemRegexp = regexp.MustCompile("^https://item.mercari.com/jp/m[0-9]+/")
 var pageRegexp = regexp.MustCompile("^/jp/search/?page=[0-9]+")
 
 // Start starts crawling all items of the search result page with search condition string
 func Start(search string) {
+	var pageSem = make(chan bool, pageWorkers)
+	var itemSem = make(chan bool, itemWorkers)
+
 	url := base + search
-	go crawlPage(url)
+	go crawlPage(url, pageSem, itemSem)
 }
 
-func crawlPage(url string) {
+func crawlPage(url string, pageSem chan bool, itemSem chan bool) {
+	pageSem <- true
+	defer func() { <-pageSem }()
+
 	fmt.Println("Crawling " + url)
 	res, err := http.Get(url)
 
@@ -49,16 +57,18 @@ func crawlPage(url string) {
 				}
 				switch {
 				case itemRegexp.MatchString(href):
-					go crawlItem(href)
+					go crawlItem(href, itemSem)
 				case pageRegexp.MatchString(href):
-					go crawlPage(href)
+					go crawlPage(href, pageSem, itemSem)
 				}
 			}
 		}
 	}
 }
 
-func crawlItem(url string) {
+func crawlItem(url string, itemSem chan bool) {
+	itemSem <- true
+	defer func() { <-itemSem }()
 	fmt.Println(url)
 }
 
