@@ -2,32 +2,60 @@
 package mercrawl
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"regexp"
+	"strconv"
 	"sync"
 
+	_ "github.com/lib/pq"
 	"golang.org/x/net/html"
 )
 
+const domain string = "https://www.mercari.com"
 const base string = "https://www.mercari.com/jp/search/?"
-const pageWorkers int = 5
-const itemWorkers int = 10
 
 var itemRegexp = regexp.MustCompile("^https://item\\.mercari\\.com/jp/(m[0-9]+)/")
-var pageRegexp = regexp.MustCompile("^/jp/search/\\?page=([0-9]+)")
+var pageRegexp = regexp.MustCompile("/jp/search/\\?page=([0-9]+)")
+var connStr = "user=" + os.Getenv("USER") + " dbname=" + os.Getenv("DBNAME") + " sslmode=" + os.Getenv("SSLMODE")
+var db *sql.DB
 
 // Start starts crawling all items of the search result page with search condition string
 func Start(search string) {
+	var pageWorkers int
+	var itemWorkers int
+	var err error
+	pageWorkers, err = strconv.Atoi(os.Getenv("PAGE_WORKERS"))
+	if err != nil || pageWorkers <= 0 {
+		pageWorkers = 5
+	}
+	itemWorkers, err = strconv.Atoi(os.Getenv("ITEM_WORKERS"))
+	if err != nil || itemWorkers <= 0 {
+		itemWorkers = 20
+	}
+
+	url := base + search
 	pageSem := make(chan bool, pageWorkers)
 	itemSem := make(chan bool, itemWorkers)
 	pageState := PageState{make(map[string]bool), &sync.Mutex{}}
 
-	url := base + search
-	go crawlPage(url, pageSem, itemSem, pageState)
+	// Will not crawl ?page=1 since it is same with a page who does not have `page` parameter.
+	if !pageRegexp.MatchString(url) {
+		pageState.Set("1")
+	}
+
+	db, err = sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go crawlPage(url, pageSem, itemSem, &pageState)
 }
 
-func crawlPage(url string, pageSem chan bool, itemSem chan bool, pageState PageState) {
+func crawlPage(url string, pageSem chan bool, itemSem chan bool, pageState *PageState) {
 	pageSem <- true
 	defer func() { <-pageSem }()
 
@@ -61,12 +89,11 @@ func crawlPage(url string, pageSem chan bool, itemSem chan bool, pageState PageS
 					go crawlItem(href, itemSem)
 				case pageRegexp.MatchString(href):
 					num := pageRegexp.FindStringSubmatch(href)[1]
-					fmt.Println("found ", num)
 					if pageState.Get(num) {
 						return
 					}
 					pageState.Set(num)
-					go crawlPage(base+href, pageSem, itemSem, pageState)
+					go crawlPage(domain+href, pageSem, itemSem, pageState)
 				}
 			}
 		}

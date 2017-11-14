@@ -17,11 +17,11 @@ func GetAttr(t html.Token, attr string) (ok bool, val string) {
 }
 
 // ParsePrice parse a JPY price like ¥ 168,800 to float32 168800.0
-func ParsePrice(s string) (f float32) {
-	var weight float32 = 1.0
+func ParsePrice(s string) (price int) {
+	weight := 1
 	for i := len(s) - 1; i >= 0; i-- {
 		if s[i] >= '0' && s[i] <= '9' {
-			f += float32(s[i]-'0') * weight
+			price += int(s[i]-'0') * weight
 			weight *= 10
 		}
 	}
