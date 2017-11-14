@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"sync"
 
 	"golang.org/x/net/html"
 )
@@ -13,19 +14,20 @@ const base string = "https://www.mercari.com/jp/search/?"
 const pageWorkers int = 5
 const itemWorkers int = 10
 
-var itemRegexp = regexp.MustCompile("^https://item.mercari.com/jp/m[0-9]+/")
-var pageRegexp = regexp.MustCompile("^/jp/search/?page=[0-9]+")
+var itemRegexp = regexp.MustCompile("^https://item\\.mercari\\.com/jp/m[0-9]+/")
+var pageRegexp = regexp.MustCompile("^/jp/search/\\?page=([0-9]+)")
 
 // Start starts crawling all items of the search result page with search condition string
 func Start(search string) {
-	var pageSem = make(chan bool, pageWorkers)
-	var itemSem = make(chan bool, itemWorkers)
+	pageSem := make(chan bool, pageWorkers)
+	itemSem := make(chan bool, itemWorkers)
+	pageState := PageState{make(map[string]bool), &sync.Mutex{}}
 
 	url := base + search
-	go crawlPage(url, pageSem, itemSem)
+	go crawlPage(url, pageSem, itemSem, pageState)
 }
 
-func crawlPage(url string, pageSem chan bool, itemSem chan bool) {
+func crawlPage(url string, pageSem chan bool, itemSem chan bool, pageState PageState) {
 	pageSem <- true
 	defer func() { <-pageSem }()
 
@@ -59,7 +61,13 @@ func crawlPage(url string, pageSem chan bool, itemSem chan bool) {
 				case itemRegexp.MatchString(href):
 					go crawlItem(href, itemSem)
 				case pageRegexp.MatchString(href):
-					go crawlPage(href, pageSem, itemSem)
+					num := pageRegexp.FindStringSubmatch(href)[1]
+					fmt.Println("found ", num)
+					if pageState.Get(num) {
+						return
+					}
+					pageState.Set(num)
+					go crawlPage(base+href, pageSem, itemSem, pageState)
 				}
 			}
 		}
