@@ -10,6 +10,10 @@ import (
 )
 
 func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("usage:\n\tmercrawl \"search_condition\"")
+		os.Exit(1)
+	}
 	search := os.Args[1]
 
 	s := os.Getenv("RECRAWL_INTERVAL")
