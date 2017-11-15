@@ -26,16 +26,17 @@ Example: search on sale PS4 Pro with category of "家庭用ゲーム本体" and 
 ## Environment Variables
 
 Global configurations:
-* `PAGE_WORKERS`: max goroutine number for crawling a search result page. Default value is 5
-* `ITEM_WORKERS`: max goroutine number for crawling an item page. Default value is 20
-
-Database related:
 * `USER`: database username
 * `DBNAME`: database name
 * `SSLMODE`: should be `disable` or `verify-full`
 
-Mailer related:
-* `INTERVAL`: seconds interval of sending new item info. Default interval is 30 seconds if the variable is not set.
+Crawler configurations:
+* `PAGE_WORKERS`: max goroutine number for crawling a search result page. Default value is 5
+* `ITEM_WORKERS`: max goroutine number for crawling an item page. Default value is 20
+* `RECRAWL_INTERVAL`: interval of re-crawl with the same search condition. Default interval is 30 seconds if the variable is not set.
+
+Mailer configurations:
+* `INTERVAL`: interval of sending new item info in seconds. Default interval is 30 seconds if the variable is not set.
 * `SMTP_SERVER`: mail server address
 * `SMTP_PORT`: mail server port
 * `SMTP_USER`: mail server login user name

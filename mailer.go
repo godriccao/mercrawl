@@ -17,17 +17,12 @@ var dialer *gomail.Dialer
 // Mail scans database and send new item info to the mail address
 func Mail(to string) {
 	s := os.Getenv("INTERVAL")
-
 	interval, err := strconv.Atoi(s)
-
-	// default scan inteval is 5 seconds
 	if err != nil || interval <= 0 {
-		interval = 30
+		interval = 30 // default scan inteval is 30 seconds
 	}
 
-	interval = 10
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
-
 	go func() {
 		for ; true; <-ticker.C { // Ensure scanAndSend() run instantly. Otherwise it will run after a tick
 			go scanAndSend(to)

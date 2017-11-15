@@ -97,16 +97,15 @@ func crawlItem(url string, itemSem chan bool) {
 	itemSem <- true
 	defer func() { <-itemSem }()
 
-	doc, err := goquery.NewDocument(url)
-	fmt.Println(url)
-	if err != nil {
-		fmt.Println("ERROR: Failed to crwal " + url)
-		return
-	}
-
 	item := Item{id: itemRegexp.FindStringSubmatch(url)[1], url: url}
 	if item.Exists() {
 		fmt.Println("Item " + item.id + " already exists. Skip.")
+	}
+
+	doc, err := goquery.NewDocument(url)
+	if err != nil {
+		fmt.Println("ERROR: Failed to crwal " + url)
+		return
 	}
 
 	// item.name
