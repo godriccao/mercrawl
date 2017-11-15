@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/leekchan/accounting"
 	"gopkg.in/gomail.v2"
 )
 
@@ -28,8 +29,7 @@ func Mail(to string) {
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 
 	go func() {
-		for i := 0; i < 10; i++ {
-			<-ticker.C
+		for ; true; <-ticker.C { // Ensure scanAndSend() run instantly. Otherwise it will run after a tick
 			go scanAndSend(to)
 		}
 	}()
@@ -58,15 +58,31 @@ func send(items []Item, to string) {
 	m.SetHeader("From", os.Getenv("SMTP_USER"))
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", "[Mercrawl] Found "+strconv.Itoa(len(items))+" items that match your search condition!")
-	var body string
-	body = "Hello <b>Bob</b> and <i>Cora</i>!"
-	m.SetBody("text/html", body)
+	m.SetBody("text/html", mailBody(items))
 
 	d := getDialer()
 	if err := d.DialAndSend(m); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(len(items), "items sent.")
+}
+
+func mailBody(items []Item) (body string) {
+	ac := accounting.Accounting{Symbol: "￥", Precision: 0}
+	body = "Mercrawl Found " + strconv.Itoa(len(items)) + " new items that match your search condition!<br>"
+
+	body += "<table>\n"
+	for _, item := range items {
+		body += "<tr>\n"
+		body += "<td><a href=\"" + item.url + "\"><b>" + item.name + "</b></a></td>"
+		body += "<td>" + ac.FormatMoney(item.price) + "</td>"
+		body += "<td>" + item.status + "</td>"
+		body += "<td>" + item.shippingFee + "</td>"
+		body += "</tr>\n"
+	}
+	body += "</table>\n"
+
+	return
 }
 
 func getDialer() *gomail.Dialer {
