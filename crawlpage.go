@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"sync"
 
-	_ "github.com/lib/pq"
 	"golang.org/x/net/html"
 )
 

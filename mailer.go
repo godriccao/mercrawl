@@ -70,7 +70,7 @@ func mailBody(items []Item) (body string) {
 	body += "<table>\n"
 	for _, item := range items {
 		body += "<tr>\n"
-		body += "<td><a href=\"" + item.Url + "\"><b>" + item.Name + "</b></a></td>"
+		body += "<td><a href=\"" + item.URL + "\"><b>" + item.Name + "</b></a></td>"
 		body += "<td>" + ac.FormatMoney(item.Price) + "</td>"
 		body += "<td>" + item.Status + "</td>"
 		body += "<td>" + item.ShippingFee + "</td>"

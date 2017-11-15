@@ -16,7 +16,7 @@ After set up the environment,
 
     go run mercrawl/mercrawl.go "sort_order=&keyword=iphone+x&category_root=7&category_child=100&category_grand_child%5B859%5D=1&brand_name=&brand_id=&size_group=&price_min=60000&price_max=&item_condition_id%5B1%5D=1&item_condition_id%5B2%5D=1&status_on_sale=1" & # start crawler
     go run mermail/mermail.go your_mail_addr & # start mailer
-    go run rest-api/server.go & # start rest api server
+    go run rest-api/merest.go & # start rest api server
 
 To quickly quit mercrawl and mermail background processes,
 
