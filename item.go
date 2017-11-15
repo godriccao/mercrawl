@@ -10,15 +10,15 @@ import (
 
 // Item represents a mercari item
 type Item struct {
-	id          string
-	name        string
-	photos      [4]string
-	status      string
-	price       int
-	shippingFee string
-	description string
-	url         string
-	sent        bool
+	Id          string    `json:"id"`
+	Name        string    `json:"name"`
+	Photos      [4]string `json:"photos,omitempty"`
+	Status      string    `json:"status,omitempty"`
+	Price       int       `json:"price,omitempty"`
+	ShippingFee string    `json:"shippingFee,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Url         string    `json:"url,omitempty"`
+	Sent        bool      `json:"sent,omitempty"`
 }
 
 // Exists checks if an item is already in database
@@ -26,7 +26,7 @@ func (item *Item) Exists() bool {
 	sql := "SELECT count(*) as total FROM items WHERE id = $1"
 	total := 0
 	db := GetDb()
-	err := db.QueryRow(sql, item.id).Scan(&total)
+	err := db.QueryRow(sql, item.Id).Scan(&total)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,14 +48,17 @@ func (item *Item) Save() {
 	// Scan() here is critical. Without calling it will cause leaking connections.
 	// Refer to https://www.vividcortex.com/blog/2015/09/22/common-pitfalls-go/
 	db.QueryRow(insertSQL,
-		item.id,
-		item.name,
-		item.photos[0], item.photos[1], item.photos[2], item.photos[3],
-		item.status,
-		item.price,
-		item.shippingFee,
-		item.description,
-		item.url).Scan()
+		item.Id,
+		item.Name,
+		item.Photos[0],
+		item.Photos[1],
+		item.Photos[2],
+		item.Photos[3],
+		item.Status,
+		item.Price,
+		item.ShippingFee,
+		item.Description,
+		item.Url).Scan()
 
 }
 
@@ -75,17 +78,51 @@ func GetUnsentItems() (items []Item) {
 	for rows.Next() {
 		item := Item{}
 		err := rows.Scan(
-			&item.id,
-			&item.name,
-			&item.photos[0],
-			&item.photos[1],
-			&item.photos[2],
-			&item.photos[3],
-			&item.status,
-			&item.price,
-			&item.shippingFee,
-			&item.description,
-			&item.url)
+			&item.Id,
+			&item.Name,
+			&item.Photos[0],
+			&item.Photos[1],
+			&item.Photos[2],
+			&item.Photos[3],
+			&item.Status,
+			&item.Price,
+			&item.ShippingFee,
+			&item.Description,
+			&item.Url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		items = append(items, item)
+	}
+
+	return
+}
+
+func GetAllItems() (items []Item) {
+	sql := "SELECT id, name, photo1, photo2, photo3, photo4, status, price, shippingFee, description, url, sent FROM items"
+	db = GetDb()
+
+	rows, err := db.Query(sql)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := Item{}
+		err := rows.Scan(
+			&item.Id,
+			&item.Name,
+			&item.Photos[0],
+			&item.Photos[1],
+			&item.Photos[2],
+			&item.Photos[3],
+			&item.Status,
+			&item.Price,
+			&item.ShippingFee,
+			&item.Description,
+			&item.Url,
+			&item.Sent)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -101,7 +138,7 @@ func MarkAsSent(items []Item) {
 
 	var ids []string
 	for _, item := range items {
-		ids = append(ids, item.id)
+		ids = append(ids, item.Id)
 	}
 
 	rows, err := db.Query(sql, pq.Array([]string(ids)))
@@ -115,9 +152,9 @@ func crawlItem(url string, itemSem chan bool) {
 	itemSem <- true
 	defer func() { <-itemSem }()
 
-	item := Item{id: itemRegexp.FindStringSubmatch(url)[1], url: url}
+	item := Item{Id: itemRegexp.FindStringSubmatch(url)[1], Url: url}
 	if item.Exists() {
-		fmt.Println("Item " + item.id + " already exists. Skip.")
+		fmt.Println("Item " + item.Id + " already exists. Skip.")
 	}
 
 	doc, err := goquery.NewDocument(url)
@@ -128,25 +165,25 @@ func crawlItem(url string, itemSem chan bool) {
 
 	// item.name
 	doc.Find("h2.item-name").Each(func(i int, s *goquery.Selection) {
-		item.name = s.Text()
+		item.Name = s.Text()
 	})
 	doc.Find(".item-photo img").Each(func(i int, s *goquery.Selection) {
 		src, _ := s.Attr("data-src")
-		item.photos[i] = src
+		item.Photos[i] = src
 	})
 	doc.Find("table.item-detail-table tbody tr").Each(func(i int, s *goquery.Selection) {
 		if s.Find("th").Text() == "商品の状態" {
-			item.status = s.Find("td").Text()
+			item.Status = s.Find("td").Text()
 		}
 	})
 	doc.Find("span.item-price").Each(func(i int, s *goquery.Selection) {
-		item.price = ParsePrice(s.Text())
+		item.Price = ParsePrice(s.Text())
 	})
 	doc.Find("span.item-shipping-fee").Each(func(i int, s *goquery.Selection) {
-		item.shippingFee = s.Text()
+		item.ShippingFee = s.Text()
 	})
 	doc.Find("div.item-description").Each(func(i int, s *goquery.Selection) {
-		item.description = s.Text()
+		item.Description = s.Text()
 	})
 
 	item.Save()
