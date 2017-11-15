@@ -2,9 +2,7 @@
 package mercrawl
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -20,8 +18,6 @@ const base string = "https://www.mercari.com/jp/search/?"
 
 var itemRegexp = regexp.MustCompile("^https://item\\.mercari\\.com/jp/(m[0-9]+)/")
 var pageRegexp = regexp.MustCompile("/jp/search/\\?page=([0-9]+)")
-var connStr = "user=" + os.Getenv("USER") + " dbname=" + os.Getenv("DBNAME") + " sslmode=" + os.Getenv("SSLMODE")
-var db *sql.DB
 
 // Start starts crawling all items of the search result page with search condition string
 func Start(search string) {
@@ -45,11 +41,6 @@ func Start(search string) {
 	// Will not crawl ?page=1 since it is same with a page who does not have `page` parameter.
 	if !pageRegexp.MatchString(url) {
 		pageState.Set("1")
-	}
-
-	db, err = sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	go crawlPage(url, pageSem, itemSem, &pageState)

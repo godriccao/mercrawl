@@ -21,8 +21,9 @@ type Item struct {
 
 // Exists checks if an item is already in database
 func (item *Item) Exists() bool {
-	sql := "SELECT count(*) as total FROM items where id = $1"
+	sql := "SELECT count(*) as total FROM items WHERE id = $1"
 	total := 0
+	db := GetDb()
 	err := db.QueryRow(sql, item.id).Scan(&total)
 	if err != nil {
 		log.Fatal(err)
@@ -41,6 +42,7 @@ func (item *Item) Save() {
 	INSERT INTO items (id, name, photo1, photo2, photo3, photo4, status, price, shippingFee, description, url) 
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 	`
+	db := GetDb()
 
 	// Scan() here is critical. Without calling it will cause leaking connections.
 	// Refer to https://www.vividcortex.com/blog/2015/09/22/common-pitfalls-go/

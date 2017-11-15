@@ -1,8 +1,27 @@
 package mercrawl
 
 import (
+	"os"
+	"os/signal"
+	"sync"
+
 	"golang.org/x/net/html"
 )
+
+// WaitInterupt wait an interupt signal ^c to end the program
+func WaitInterupt() {
+	var end sync.WaitGroup
+	endSignal := make(chan os.Signal, 1)
+	signal.Notify(endSignal, os.Interrupt)
+
+	end.Add(1)
+	go func() {
+		<-endSignal
+		end.Done()
+	}()
+
+	end.Wait()
+}
 
 // GetAttr get href value from html token
 func GetAttr(t html.Token, attr string) (ok bool, val string) {
