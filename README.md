@@ -1,16 +1,16 @@
 # mercrawl
 
-mercrawl crawls Mercari items of your search condition and send you the result by email.
+`mercrawl` crawls Mercari items of your search condition and send you the result by email.
 
 ## Getting started
 
 1. Install Postgresql
-2. Set up the database. Refer to `migrate.sql`
-3. Set up the environment variables. See **Environment Variables** below. You can utilize `setenv.sh` template for your convenience.
+2. Set up database. Refer to `migrate.sql`
+3. Set up environment variables. See **Environment Variables** below. You can utilize `setenv.sh` template for your convenience.
 
 ## Usage
 
-### I just wanna try it ASAP!
+### Try it ASAP!
 
 After set up the environment,
 
@@ -18,13 +18,15 @@ After set up the environment,
     go run mermail/mermail.go your_mail_addr & # start mailer
     go run rest-api/merest.go & # start rest api server
 
-To quickly quit mercrawl, mermail and merest background processes,
+To quickly quit `mercrawl`, `mermail` and `merest` background processes,
 
     kill %1 %2 %3
 
 ### Crawler
 
-`mercrawl search_condition`
+Usage:
+
+`mercrawl <search_condition>`
 * `search_condition`: string after https://www.mercari.com/jp/search/?
 
 Example: search on sale PS4 Pro with category of "家庭用ゲーム本体" and price range ¥30,000 ~ ¥45,000
@@ -33,11 +35,17 @@ Example: search on sale PS4 Pro with category of "家庭用ゲーム本体" and 
 
 ### Mailer
 
+Usage:
+
 `mermail <mail_addr>`
 
-You will receive mail like this if mercrawl successfully scrape new items
+You will receive email like this if `mercrawl` successfully scrape new items
+
+![email sent from mermail](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "email sent from mermail")
 
 ### RESTful API Server
+
+Usage:
 
 `merest`
 
@@ -51,7 +59,7 @@ After the server started, you can access the following resources in JSON:
 Global configurations:
 * `USER`: database username
 * `DBNAME`: database name
-* `SSLMODE`: should be `disable` or `verify-full`
+* `SSLMODE`: `disable` or `verify-full`
 
 Crawler configurations:
 * `PAGE_WORKERS`: max goroutine number for crawling a search result page. Default value is 5
@@ -72,6 +80,6 @@ RESTful API Server configurations:
 
 * Postgresql
 
-## Tuning
+## Performance Tuning
 
 Tune the `itemWorkers` and `pageWorkers` parameters to achieve a better performance for your environment.
