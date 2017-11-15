@@ -41,7 +41,7 @@ Usage:
 
 You will receive email like this if `mercrawl` successfully scrape new items
 
-![email sent from mermail](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "email sent from mermail")
+![email sent from mermail](img/mermail-example.png "email sent from mermail")
 
 ### RESTful API Server
 
