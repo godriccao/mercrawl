@@ -28,6 +28,7 @@ func crawlItem(url string, itemSem chan bool) {
 	item := Item{ID: itemRegexp.FindStringSubmatch(url)[1], URL: url}
 	if item.Exists() {
 		fmt.Println("Item " + item.ID + " already exists. Skip.")
+		return
 	}
 
 	fmt.Println("[Crawling Item]" + url)

@@ -5,10 +5,10 @@ import (
 	"os"
 )
 
-var connStr = "user=" + os.Getenv("USER") + " dbname=" + os.Getenv("DBNAME") + " sslmode=" + os.Getenv("SSLMODE")
+var connStr = "user=" + os.Getenv("USER") + " dbname=mercrawl" + " sslmode=" + os.Getenv("SSLMODE")
 var db *sql.DB
 
-// GetDb returns an instance of postgres database connection.
+// GetDb returns an instance of Postgresql database connection.
 func GetDb() *sql.DB {
 	if db != nil {
 		return db

@@ -58,23 +58,22 @@ After the server started, you can access the following resources in JSON:
 
 Global configurations:
 * `USER`: database username
-* `DBNAME`: database name
 * `SSLMODE`: `disable` or `verify-full`
 
 Crawler configurations:
-* `PAGE_WORKERS`: max goroutine number for crawling a search result page. Default value is 5
-* `ITEM_WORKERS`: max goroutine number for crawling an item page. Default value is 20
-* `RECRAWL_INTERVAL`: interval of re-crawl with the same search condition. Default interval is 30 seconds if the variable is not set.
+* `PAGE_WORKERS`(optional): max goroutine number for crawling a search result page. Default value is 5
+* `ITEM_WORKERS`(optional): max goroutine number for crawling an item page. Default value is 20
+* `RECRAWL_INTERVAL`(optional): interval of re-crawl with the same search condition. Default interval is 30 seconds if the variable is not set.
 
 Mailer configurations:
-* `INTERVAL`: interval of sending new item info in seconds. Default interval is 30 seconds if the variable is not set.
+* `INTERVAL`(optional): interval of sending new item info in seconds. Default interval is 30 seconds if the variable is not set.
 * `SMTP_SERVER`: mail server address
 * `SMTP_PORT`: mail server port
 * `SMTP_USER`: mail server login user name
 * `SMTP_PWD`: mail server login password
 
 RESTful API Server configurations:
-* `REST_PORT`: rest-api server port. default is 8000
+* `REST_PORT`(optional): rest-api server port. default is 8000
 
 ## Dependency
 
