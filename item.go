@@ -11,7 +11,7 @@ import (
 type Item struct {
 	id          string
 	name        string
-	photos      []string
+	photos      [4]string
 	status      string
 	price       int
 	shippingFee string
@@ -27,7 +27,6 @@ func (item *Item) Exists() bool {
 	err := db.QueryRow(sql, item.id).Scan(&total)
 	if err != nil {
 		log.Fatal(err)
-		panic(err)
 	}
 
 	if total > 0 {
@@ -58,6 +57,42 @@ func (item *Item) Save() {
 
 }
 
+// GetUnsentItems get all unsent items from database
+func GetUnsentItems() (items []Item) {
+	sql := `SELECT id, name, photo1, photo2, photo3, photo4, status, price, shippingFee, description, url 
+			FROM items 
+			WHERE sent = false`
+	db = GetDb()
+
+	rows, err := db.Query(sql)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := Item{}
+		err := rows.Scan(
+			&item.id,
+			&item.name,
+			&item.photos[0],
+			&item.photos[1],
+			&item.photos[2],
+			&item.photos[3],
+			&item.status,
+			&item.price,
+			&item.shippingFee,
+			&item.description,
+			&item.url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		items = append(items, item)
+	}
+
+	return
+}
+
 func crawlItem(url string, itemSem chan bool) {
 	itemSem <- true
 	defer func() { <-itemSem }()
@@ -69,7 +104,7 @@ func crawlItem(url string, itemSem chan bool) {
 		return
 	}
 
-	item := Item{id: itemRegexp.FindStringSubmatch(url)[1], url: url, photos: make([]string, 4)}
+	item := Item{id: itemRegexp.FindStringSubmatch(url)[1], url: url}
 	if item.Exists() {
 		fmt.Println("Item " + item.id + " already exists. Skip.")
 	}
@@ -80,7 +115,7 @@ func crawlItem(url string, itemSem chan bool) {
 	})
 	doc.Find(".item-photo img").Each(func(i int, s *goquery.Selection) {
 		src, _ := s.Attr("data-src")
-		item.photos = append(item.photos, src)
+		item.photos[i] = src
 	})
 	doc.Find("table.item-detail-table tbody tr").Each(func(i int, s *goquery.Selection) {
 		if s.Find("th").Text() == "商品の状態" {
