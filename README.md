@@ -4,8 +4,8 @@ mercrawl crawls Mercari items of your search condition and send you the result b
 
 ## Getting started
 
-1. Install postgresql
-2. Set up the dataabase. Refer to `migrate.sql`
+1. Install Postgresql
+2. Set up the database. Refer to `migrate.sql`
 3. Set up the environment variables. See **Environment Variables** below. You can utilize `setenv.sh` template for your convenience.
 
 ## Usage
@@ -18,7 +18,7 @@ After set up the environment,
     go run mermail/mermail.go your_mail_addr & # start mailer
     go run rest-api/merest.go & # start rest api server
 
-To quickly quit mercrawl and mermail background processes,
+To quickly quit mercrawl, mermail and merest background processes,
 
     kill %1 %2 %3
 
@@ -34,6 +34,8 @@ Example: search on sale PS4 Pro with category of "家庭用ゲーム本体" and 
 ### Mailer
 
 `mermail <mail_addr>`
+
+You will receive mail like this if mercrawl successfully scrape new items
 
 ### RESTful API Server
 
