@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/lib/pq"
 )
 
 // Item represents a mercari item
@@ -17,6 +18,7 @@ type Item struct {
 	shippingFee string
 	description string
 	url         string
+	sent        bool
 }
 
 // Exists checks if an item is already in database
@@ -91,6 +93,22 @@ func GetUnsentItems() (items []Item) {
 	}
 
 	return
+}
+
+func MarkAsSent(items []Item) {
+	db := GetDb()
+	sql := "UPDATE items SET sent = true WHERE id = ANY ($1)"
+
+	var ids []string
+	for _, item := range items {
+		ids = append(ids, item.id)
+	}
+
+	rows, err := db.Query(sql, pq.Array([]string(ids)))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
 }
 
 func crawlItem(url string, itemSem chan bool) {

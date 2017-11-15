@@ -31,7 +31,6 @@ func Mail(to string) {
 }
 
 func scanAndSend(to string) {
-	println("send to " + to)
 	db = GetDb()
 
 	sql := "SELECT count(*) as total FROM items WHERE sent = false"
@@ -43,6 +42,7 @@ func scanAndSend(to string) {
 		log.Fatal(err)
 	}
 	if total > 0 {
+		println("sending to " + to)
 		items := GetUnsentItems()
 		send(items, to)
 	}
@@ -59,6 +59,7 @@ func send(items []Item, to string) {
 	if err := d.DialAndSend(m); err != nil {
 		log.Fatal(err)
 	}
+	MarkAsSent(items)
 	fmt.Println(len(items), "items sent.")
 }
 

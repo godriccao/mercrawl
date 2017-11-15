@@ -8,3 +8,4 @@ export SMTP_SERVER=smtp_server
 export SMTP_PORT=smtp_port
 export SMTP_USER=smtp_user
 export SMTP_PWD=smtp_pwd
+export REST_PORT=8000

@@ -34,6 +34,8 @@ Example: search on sale PS4 Pro with category of "家庭用ゲーム本体" and 
 
 `mermail <mail_addr>`
 
+### RESTful API Server
+
 ## Environment Variables
 
 Global configurations:
@@ -52,6 +54,9 @@ Mailer configurations:
 * `SMTP_PORT`: mail server port
 * `SMTP_USER`: mail server login user name
 * `SMTP_PWD`: mail server login password
+
+RESTful API Server configurations:
+* `REST_PORT`: rest-api server port. default is 8000
 
 ## Requirements
 
