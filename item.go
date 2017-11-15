@@ -132,6 +132,30 @@ func GetAllItems() (items []Item) {
 	return
 }
 
+func GetItem(id string) (item Item) {
+	sql := "SELECT id, name, photo1, photo2, photo3, photo4, status, price, shippingFee, description, url, sent FROM items WHERE id = $1"
+	db = GetDb()
+
+	err := db.QueryRow(sql, id).Scan(
+		&item.Id,
+		&item.Name,
+		&item.Photos[0],
+		&item.Photos[1],
+		&item.Photos[2],
+		&item.Photos[3],
+		&item.Status,
+		&item.Price,
+		&item.ShippingFee,
+		&item.Description,
+		&item.Url,
+		&item.Sent)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return
+}
+
 func MarkAsSent(items []Item) {
 	db := GetDb()
 	sql := "UPDATE items SET sent = true WHERE id = ANY ($1)"
@@ -157,6 +181,7 @@ func crawlItem(url string, itemSem chan bool) {
 		fmt.Println("Item " + item.Id + " already exists. Skip.")
 	}
 
+	fmt.Println("[Crawling Item]" + url)
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		fmt.Println("ERROR: Failed to crwal " + url)

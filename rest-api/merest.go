@@ -23,9 +23,10 @@ func main() {
 }
 
 func GetItems(w http.ResponseWriter, r *http.Request) {
-	items := mercrawl.GetAllItems()
-	json.NewEncoder(w).Encode(items)
+	json.NewEncoder(w).Encode(mercrawl.GetAllItems())
 }
 func GetItem(w http.ResponseWriter, r *http.Request) {
-
+	params := mux.Vars(r)
+	id := params["id"]
+	json.NewEncoder(w).Encode(mercrawl.GetItem(id))
 }

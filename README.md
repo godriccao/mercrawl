@@ -37,6 +37,13 @@ Example: search on sale PS4 Pro with category of "家庭用ゲーム本体" and 
 
 ### RESTful API Server
 
+`merest`
+
+After the server started, you can access the following resources in JSON:
+
+    GET /items
+    GET /item/{id}
+
 ## Environment Variables
 
 Global configurations:
@@ -59,7 +66,7 @@ Mailer configurations:
 RESTful API Server configurations:
 * `REST_PORT`: rest-api server port. default is 8000
 
-## Requirements
+## Dependency
 
 * Postgresql
 

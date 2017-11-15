@@ -21,10 +21,12 @@ ALTER TABLE items ADD COLUMN sent bool;
 
 CREATE INDEX sent_idx ON items (sent);
 
-ALTER TABLE items 
-    ALTER COLUMN sent SET DEFAULT FALSE;
+ALTER TABLE items ALTER COLUMN sent SET DEFAULT FALSE;
 
 UPDATE items SET sent = false;
 
-ALTER TABLE items 
-    ALTER COLUMN sent SET NOT NULL;
+ALTER TABLE items ALTER COLUMN sent SET NOT NULL;
+
+ALTER TABLE items ALTER COLUMN id TYPE varchar(20)
+ALTER TABLE items ALTER COLUMN status TYPE varchar(40)
+ALTER TABLE items ALTER COLUMN shippingFee TYPE varchar(20)

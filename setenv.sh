@@ -1,5 +1,6 @@
 export PAGE_WORKERS=5
 export ITEM_WORKERS=20
+export RECRAWL_INTERVAL=30
 export USER=db_user
 export DBNAME=db_name
 export SSLMODE=db_sslmode

@@ -50,7 +50,7 @@ func crawlPage(url string, pageSem chan bool, itemSem chan bool, pageState *Page
 	pageSem <- true
 	defer func() { <-pageSem }()
 
-	fmt.Println("Crawling " + url)
+	fmt.Println("[Crawling Page] " + url)
 
 	res, err := http.Get(url)
 	if err != nil {
