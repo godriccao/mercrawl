@@ -1,0 +1,10 @@
+export PAGE_WORKERS=5
+export ITEM_WORKERS=40
+export USER=mercrawl
+export DBNAME=mercrawl
+export SSLMODE=disable
+export INTERVAL=30
+export SMTP_SERVER=smtp.gmail.com
+export SMTP_PORT=465
+export SMTP_USER=yysggl01@gmail.com
+export SMTP_PWD=asdfasdf1
