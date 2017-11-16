@@ -33,7 +33,7 @@ Example: search on sale PS4 Pro with category of "家庭用ゲーム本体" and 
 
     mercrawl "keyword=ps4+pro&category_root=5&category_child=76&category_grand_child%5B701%5D=1&price_min=30000&price_max=45000&status_on_sale=1"
 
-**WARNING** A too generate search condition that have too many pages of result may cause your IP address banned by Mercari. Please make your search condition be as precise as possible.
+**WARNING** A too generic search condition that have too many pages of result may cause your IP address banned by Mercari. Please make your search condition be as precise as possible.
 
 ### Mailer
 
